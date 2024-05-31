@@ -20,4 +20,12 @@ public abstract class Catalogue {
                 ", publishingYear: " + publishingYear +
                 ", pagesNumber: " + pagesNumber;
     }
+
+    public int getPublishingYear() {
+        return publishingYear;
+    }
+
+    public String getISBN() {
+        return ISBN;
+    }
 }

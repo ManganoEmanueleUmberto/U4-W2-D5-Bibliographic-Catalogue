@@ -16,4 +16,8 @@ public class Book extends Catalogue {
                 ", author: " + author +
                 ", genre: " + genre;
     }
+
+    public String getAuthor() {
+        return author;
+    }
 }
