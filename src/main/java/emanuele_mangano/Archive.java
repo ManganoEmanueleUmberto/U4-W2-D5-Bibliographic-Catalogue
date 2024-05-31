@@ -4,7 +4,11 @@ import com.github.javafaker.Faker;
 import emanuele_mangano.Entities.Book;
 import emanuele_mangano.Entities.Catalogue;
 import emanuele_mangano.Entities.Magazine;
+import org.apache.commons.io.FileUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +22,7 @@ public class Archive {
         Faker faker = new Faker();
         Random rnd = new Random();
         Scanner sc = new Scanner(System.in);
+        File file = new File("src/Archive.txt");
         int choice, choiceLength;
 
         Supplier<Book> bookSupplier = () -> {
@@ -37,7 +42,7 @@ public class Archive {
                     + "2. Generate one or more Magazines" + System.lineSeparator() + "3. Print All the Book/Magazine and Magazines " + System.lineSeparator()
                     + "4. Remove a Book/Magazine by ISBN" + System.lineSeparator() + "5. Search a Book/Magazine by ISBN " + System.lineSeparator()
                     + "6. Search a Book/Magazine by publishing year" + System.lineSeparator() + "7. Search a Book/Magazine by author " + System.lineSeparator()
-                    + "0. Exit");
+                    + "8. Save the Archive on disk " + System.lineSeparator() + "9. Read the archive from disk " + System.lineSeparator() + "0. Exit");
             try {
 
                 choice = Integer.parseInt(sc.nextLine());
@@ -94,6 +99,17 @@ public class Archive {
                         searchElementByAuthor(catalogue, authorToSearch);
                         break;
 
+                    case 8:
+                        saveArchiveOnDisk(catalogue, file);
+                        System.out.println("Archive successfully saved");
+                        break;
+
+                    case 9:
+                        List<String> listFromDisk;
+                        listFromDisk = readArchiveFromDisk(file);
+                        System.out.println(listFromDisk);
+                        break;
+
                     default:
                         System.out.println("You have entered a wrong number! Retry");
                         break;
@@ -124,7 +140,7 @@ public class Archive {
     }
 
     public static void searchElementByISBN(List<Catalogue> catalogue, String ISBNToSearch) {
-        List<Catalogue> searchList = new ArrayList<>();
+        List<Catalogue> searchList;
         searchList = catalogue.stream().filter(element -> element.getISBN().equals(ISBNToSearch)).toList();
         if (searchList.isEmpty())
             System.out.println("The are no books with " + ISBNToSearch + " ISBN in the archive");
@@ -132,7 +148,7 @@ public class Archive {
     }
 
     public static void searchElementByPublishingYear(List<Catalogue> catalogue, int yearToSearch) {
-        List<Catalogue> searchList = new ArrayList<>();
+        List<Catalogue> searchList;
         searchList = catalogue.stream().filter(element -> element.getPublishingYear() == yearToSearch).toList();
         if (searchList.isEmpty())
             System.out.println("The are no books published in " + yearToSearch + " in the archive");
@@ -140,7 +156,7 @@ public class Archive {
     }
 
     public static void searchElementByAuthor(List<Catalogue> catalogue, String author) {
-        List<Catalogue> searchList = new ArrayList<>();
+        List<Catalogue> searchList;
         searchList = catalogue.stream()
                 .filter(element -> element instanceof Book && ((Book) element).getAuthor().equals(author))
                 .toList();
@@ -148,6 +164,25 @@ public class Archive {
             System.out.println("The are no books from " + author + " in the archive");
         else System.out.println(searchList);
 
+    }
+
+    public static void saveArchiveOnDisk(List<Catalogue> catalogue, File file) {
+        try {
+            FileUtils.writeStringToFile(file, catalogue + System.lineSeparator(), StandardCharsets.UTF_8, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<String> readArchiveFromDisk(File file) {
+        try {
+            List<String> listToReturn = new ArrayList<>();
+            String stringToConvert = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+            listToReturn.add(stringToConvert);
+            return listToReturn;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
